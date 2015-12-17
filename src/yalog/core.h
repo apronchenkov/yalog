@@ -29,6 +29,7 @@ struct YalogSink {
 
   int threshold;
   void (*Send)(YalogSink * /*self*/, const YalogMessage * /*message*/);
+  void (*Flush)(YalogSink * /*self*/);
 };
 
 typedef struct YalogConfig YalogConfig;

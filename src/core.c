@@ -16,7 +16,7 @@ static const YalogConfig *global_config = NULL;
 struct Logger {
   volatile int threshold;
   YalogSpinlock lock;
-  const YalogSink *sink;
+  YalogSink *sink;
   Logger *next;
   char tag[1];
 };
@@ -51,7 +51,7 @@ Logger *GetLogger(const char *tag) {
 
 void YalogSend(Logger *logger, int severity, const char *file, int line,
                const char *format, ...) {
-  const YalogSink *sink = NULL;
+  YalogSink *sink = NULL;
   YalogSpinLock(&logger->lock);
   if (logger->sink && logger->sink->threshold <= severity) {
     sink = YALOG_REF_ACQUIRE(logger->sink);
@@ -88,9 +88,9 @@ void YalogSend(Logger *logger, int severity, const char *file, int line,
   }
 }
 
-static void YalogSetSink(Logger *logger, const YalogSink *sink) {
+static void YalogSetSink(Logger *logger, YalogSink *sink) {
   YalogSpinLock(&logger->lock);
-  const YalogSink *old_sink = logger->sink;
+  YalogSink *old_sink = logger->sink;
   if (sink) {
     logger->sink = sink;
     logger->threshold = sink->threshold;
