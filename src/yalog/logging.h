@@ -30,7 +30,6 @@ void YalogSend(Logger *logger, int severity, const char *file, int line,
   else                                                      \
   YalogSend(logger, (YALOG_##severity), __FILE__, __LINE__, format, __VA_ARGS__)
 
-    
 #ifdef __cplusplus
 }  // extern "C"
 #endif

@@ -28,7 +28,7 @@ struct YalogSink {
   void (*Destroy)(const YalogSink * /*self*/);
 
   int threshold;
-  void (*Send)(const YalogSink * /*self*/, const YalogMessage * /*message*/);
+  void (*Send)(YalogSink * /*self*/, const YalogMessage * /*message*/);
 };
 
 typedef struct YalogConfig YalogConfig;
@@ -37,8 +37,7 @@ struct YalogConfig {
   atomic_uint ref_counter;
   void (*Destroy)(const YalogConfig * /*self*/);
 
-  const YalogSink *(*GetSink)(const YalogConfig * /*self*/,
-                              const char * /*tag*/);
+  YalogSink *(*GetSink)(const YalogConfig * /*self*/, const char * /*tag*/);
 };
 
 #define YALOG_REF_INIT(ptr, destroy) \
