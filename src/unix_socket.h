@@ -10,15 +10,15 @@ extern "C" {
 
 typedef struct YalogUnixSocket YalogUnixSocket;
 
-YalogUnixSocket* YalogOpenUnixSocket(const char* path, int socket_type);
+YalogUnixSocket *YalogOpenUnixSocket(const char *path, int socket_type);
 
-YalogUnixSocket* YalogAcquireUnixSocket(YalogUnixSocket* self);
+YalogUnixSocket *YalogAcquireUnixSocket(YalogUnixSocket *self);
 
-void YalogReleaseUnixSocket(YalogUnixSocket* self);
+void YalogReleaseUnixSocket(YalogUnixSocket *self);
 
-int YalogGetUnixSocketType(YalogUnixSocket* self);
+int YalogGetUnixSocketType(YalogUnixSocket *self);
 
-ssize_t YalogUnixSocketSend(YalogUnixSocket* self, struct iovec const* iov,
+ssize_t YalogUnixSocketSend(YalogUnixSocket *self, struct iovec const *iov,
                             int iovcnt);
 
 #ifdef __cplusplus

@@ -1,7 +1,9 @@
 .PHONY: all clean format
 
+OPTFLAGS = -g -O2
 CPPFLAGS += -isystem src
-CFLAGS += -Wall -Wextra -pedantic -ansi -std=c11 -g -O2
+CFLAGS += -Wall -Wextra -pedantic -std=gnu11 ${OPTFLAGS}
+LDFLAGS += -pthread -lpthread ${OPTFLAGS}
 
 all: test
 

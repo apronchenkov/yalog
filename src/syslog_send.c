@@ -1,12 +1,25 @@
 #include "syslog_send.h"
 #include "unix_socket.h"
 #include "spinlock.h"
+#include <stdbool.h>
 #include <syslog.h>
 #include <pthread.h>
 
 static YalogSpinlock global_syslog_rlock;
 static pthread_mutex_t global_syslog_wlock = PTHREAD_MUTEX_INITIALIZER;
 static YalogUnixSocket *global_syslog_socket;
+
+static inline void InitRLock() {
+  static bool done;
+  if (!done) {
+    pthread_mutex_lock(&global_syslog_wlock);
+    if (!done) {
+      YalogSpinInit(&global_syslog_rlock);
+      done = true;
+    }
+    pthread_mutex_unlock(&global_syslog_wlock);
+  }
+}
 
 static YalogUnixSocket *YalogSyslogReconnect() {
   YalogSpinLock(&global_syslog_rlock);
@@ -66,6 +79,7 @@ static bool YalogSyslogSendImpl(YalogUnixSocket *syslog_socket,
 
 void YalogSyslogSend(const char *t1, size_t t1l, const char *t2, size_t t2l,
                      const char *t3, size_t t3l, const char *t4, size_t t4l) {
+  InitRLock();
   YalogUnixSocket *syslog_socket = NULL;
   YalogSpinLock(&global_syslog_rlock);
   syslog_socket = YalogAcquireUnixSocket(global_syslog_socket);

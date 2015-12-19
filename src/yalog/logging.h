@@ -1,8 +1,6 @@
 #ifndef __yalog_logging_h__
 #define __yalog_logging_h__ 1
 
-#include <stdatomic.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -18,7 +16,7 @@ typedef struct Logger Logger;
 Logger *GetLogger(const char *tag);
 
 static inline int YalogGetLoggerThreshold(Logger *logger) {
-  return atomic_load_explicit((atomic_int *)logger, memory_order_relaxed);
+  return __atomic_load_n((int *)logger, __ATOMIC_RELAXED);
 }
 
 void YalogSend(Logger *logger, int severity, const char *file, int line,

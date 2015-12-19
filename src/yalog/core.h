@@ -2,7 +2,6 @@
 #define __yalog_core_h__ 1
 
 #include "logging.h"
-#include <stdatomic.h>
 #include <time.h>
 
 #ifdef __cplusplus
@@ -25,7 +24,7 @@ struct YalogMessage {
 typedef struct YalogSink YalogSink;
 
 struct YalogSink {
-  atomic_uint ref_counter;
+  unsigned int ref_counter;
   void (*Destroy)(const YalogSink * /*self*/);
 
   int threshold;
@@ -36,7 +35,7 @@ struct YalogSink {
 typedef struct YalogConfig YalogConfig;
 
 struct YalogConfig {
-  atomic_uint ref_counter;
+  unsigned int ref_counter;
   void (*Destroy)(const YalogConfig * /*self*/);
 
   YalogSink *(*GetSink)(const YalogConfig * /*self*/, const char * /*tag*/);
@@ -45,16 +44,16 @@ struct YalogConfig {
 #define YALOG_REF_INIT(ptr, destroy) \
   ((ptr)->ref_counter = 1, (ptr)->Destroy = destroy, (ptr))
 
-#define YALOG_REF_ACQUIRE(ptr)                                      \
-  (atomic_fetch_add_explicit((atomic_uint *)&(ptr)->ref_counter, 1, \
-                             memory_order_relaxed),                 \
+#define YALOG_REF_ACQUIRE(ptr)                                \
+  (__atomic_fetch_add((unsigned int *)&(ptr)->ref_counter, 1, \
+                      __ATOMIC_RELAXED),                      \
    (ptr))
 
-#define YALOG_REF_RELEASE(ptr)                                                \
-  if (!(ptr) || atomic_fetch_sub_explicit((atomic_uint *)&(ptr)->ref_counter, \
-                                          1, memory_order_relaxed))           \
-    (void)0;                                                                  \
-  else                                                                        \
+#define YALOG_REF_RELEASE(ptr)                                             \
+  if (!(ptr) || __atomic_sub_fetch((unsigned int *)&(ptr)->ref_counter, 1, \
+                                   __ATOMIC_RELAXED))                      \
+    (void)0;                                                               \
+  else                                                                     \
   (ptr)->Destroy(ptr)
 
 void YalogSetConfig(const YalogConfig *config);
