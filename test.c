@@ -7,6 +7,7 @@ int main() {
   YALOG(logger, DEBUG, "%s", "Hello, World!");
   YALOG(logger, INFO, "%s", "Hello, World!");
   YALOG(logger, WARNING, "%s", "Hello, World!");
+  YALOG(logger, ERROR, "%s", "Hello, World!");
   YALOG(logger, CRITICAL, "%s",
         "Long long long long long long long long long long long long long long "
         "long long long long long long long long long long long long long long "
