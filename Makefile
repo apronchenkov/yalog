@@ -1,6 +1,11 @@
 .PHONY: all clean format
 
 OPTFLAGS = -g -O2
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Darwin)
+        OPTFLAGS += -mmacosx-version-min=10.6
+endif
+
 CPPFLAGS += -isystem src
 CFLAGS += -Wall -Wextra -pedantic -std=gnu11 ${OPTFLAGS}
 LDFLAGS += -pthread -lpthread ${OPTFLAGS}
