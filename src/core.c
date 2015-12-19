@@ -74,6 +74,7 @@ void YalogSend(Logger *logger, int severity, const char *file, int line,
     va_end(args);
     if (n < 0 || ((size_t)n) < sizeof(text)) {
       message.text = text;
+      message.text_size = n;
       sink->Send(sink, &message);
     } else {
       char *big_text = malloc(n + 1);
@@ -81,6 +82,7 @@ void YalogSend(Logger *logger, int severity, const char *file, int line,
       vsnprintf(big_text, n + 1, format, args);
       va_end(args);
       message.text = big_text;
+      message.text_size = n;
       sink->Send(sink, &message);
       free(big_text);
     }

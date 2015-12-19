@@ -16,6 +16,7 @@ struct YalogMessage {
   const char *tag;
   const char *file;
   int line;
+  int text_size;
   const char *text;
   time_t time_sec;
   long time_usec;

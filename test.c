@@ -1,15 +1,9 @@
 #include <yalog/backend.h>
 #include <yalog/logging.h>
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <unistd.h>
-
 
 int main() {
   Logger *const logger = GetLogger("123");
-  YalogSetConfig(YalogCreatePlainConfig(YalogCreateStderrSink(YALOG_INFO)));
+  YalogSetConfig(YalogCreatePlainConfig(YalogCreateSyslogSink(YALOG_INFO, "main_test")));
   YALOG(logger, DEBUG, "%s", "Hello, World!");
   YALOG(logger, INFO, "%s", "Hello, World!");
   YALOG(logger, WARNING, "%s", "Hello, World!");
