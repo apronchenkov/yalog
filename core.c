@@ -1,5 +1,5 @@
-#include "yalog/core.h"
-#include "yalog/logging.h"
+#include "public/core.h"
+#include "public/logging.h"
 #include "spinlock.h"
 #include <limits.h>
 #include <pthread.h>

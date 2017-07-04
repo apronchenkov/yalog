@@ -1,5 +1,5 @@
-#include <yalog/backend.h>
-#include <yalog/logging.h>
+#include <github.com/apronchenkov/yalog/public/backend.h>
+#include <github.com/apronchenkov/yalog/public/logging.h>
 
 int main() {
   Logger *const logger = GetLogger("123");

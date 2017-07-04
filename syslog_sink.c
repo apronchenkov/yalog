@@ -1,6 +1,6 @@
-#include "yalog/backend.h"
+#include "public/backend.h"
+#include "public/core.h"
 #include "syslog_send.h"
-#include "yalog/core.h"
 #include <stdlib.h>
 #include <string.h>
 #include <syslog.h>

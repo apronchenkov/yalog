@@ -1,5 +1,5 @@
-#include "yalog/backend.h"
-#include "yalog/core.h"
+#include "public/backend.h"
+#include "public/core.h"
 #include <stdlib.h>
 
 typedef struct YalogPlainConfig YalogPlainConfig;

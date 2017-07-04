@@ -1,34 +1,34 @@
 .PHONY: all clean format
 
+PROJECT = github.com/apronchenkov/yalog
+BIN_PATH = ${TG_PATH}/bin
+PKG_PATH = ${TG_PATH}/pkg/${PROJECT}
+SRC_PATH = ${TG_PATH}/src/${PROJECT}
+
 OPTFLAGS = -g -O2
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
         OPTFLAGS += -mmacosx-version-min=10.6
 endif
 
-CPPFLAGS += -isystem src
+CPPFLAGS += -isystem ${TG_PATH}/src
 CFLAGS += -Wall -Wextra -pedantic -std=gnu11 ${OPTFLAGS}
-LDFLAGS += -pthread -lpthread ${OPTFLAGS}
+LDFLAGS += -lpthread ${OPTFLAGS}
 
-all: test
+all: ${BIN_PATH}/test ${PKG_PATH}/yalog.a
 
-test: test.o yalog.a
+${PKG_PATH}/%.o: $(SRC_PATH)/%.c
+	mkdir -p $(dir $@)
+	${CC} ${CPPFLAGS} ${CFLAGS} ${OPTFLAGS} -c -o $@ $^
 
-test.o: test.c src/yalog/logging.h src/yalog/core.h src/yalog/backend.h
-
-yalog.a: src/core.o src/file_sink.o src/plain_config.o src/stderr_sink.o src/syslog_sink.o src/unix_socket.o src/syslog_send.o
+${PKG_PATH}/yalog.a: ${PKG_PATH}/core.o ${PKG_PATH}/file_sink.o ${PKG_PATH}/plain_config.o ${PKG_PATH}/stderr_sink.o ${PKG_PATH}/syslog_sink.o ${PKG_PATH}/unix_socket.o ${PKG_PATH}/syslog_send.o
 	ar rcs $@ $^
 
-src/core.o: src/core.c src/spinlock.h src/yalog/core.h src/yalog/logging.h
-src/file_sink.o: src/file_sink.c src/yalog/backend.h src/yalog/core.h
-src/plain_config.o: src/plain_config.c src/yalog/backend.h src/yalog/core.h
-src/stderr_sink.o: src/stderr_sink.c src/yalog/backend.h
-src/syslog_send.o: src/syslog_send.c src/syslog_send.h src/unix_socket.h
-src/syslog_sink.o: src/syslog_sink.c src/yalog/backend.h src/yalog/core.h src/syslog_send.h
-src/unix_socket.o: src/unix_socket.c src/unix_socket.h
+${BIN_PATH}/test: ${PKG_PATH}/test.o ${PKG_PATH}/yalog.a
+	${CC} ${LDFLAGS} ${OPTFLAGS} -o $@ $^
 
 clean:
-	$(RM) test *.o yalog.a src/*.o
+	$(RM) ${BIN_PATH}/test ${PKG_PATH}/yalog.a ${PKG_PATH}/*.o
 
 format:
-	clang-format -i src/*.h src/*.c src/yalog/*.h
+	clang-format -i *.h *.c public/*.h
