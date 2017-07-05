@@ -10,7 +10,7 @@ LDFLAGS += -lpthread ${OPTFLAGS}
 
 .PHONY: all clean format
 
-all: ${BIN_PATH}/sample ${PKG_PATH}/core.a ${PKG_PATH}/basic.a ${PKG_PATH}/logging.a
+all: ${BIN_PATH}/yalog_sample ${PKG_PATH}/core.a ${PKG_PATH}/basic.a ${PKG_PATH}/logging.a
 
 ${PKG_PATH}/%.o: $(SRC_PATH)/%.c
 	@mkdir -p $(dir $@)
@@ -28,11 +28,11 @@ ${PKG_PATH}/logging.a: ${PKG_PATH}/logging_printf.o
 ${TG_PATH}/pkg/github.com/apronchenkov/syslog_client/syslog_client.a:
 	make -f ${TG_PATH}/src/github.com/apronchenkov/syslog_client/syslog_client.a $^
 
-${BIN_PATH}/sample: ${PKG_PATH}/sample.o ${PKG_PATH}/core.a ${PKG_PATH}/basic.a ${PKG_PATH}/logging.a ${TG_PATH}/pkg/github.com/apronchenkov/syslog_client/syslog_client.a
+${BIN_PATH}/yalog_sample: ${PKG_PATH}/sample.o ${PKG_PATH}/core.a ${PKG_PATH}/basic.a ${PKG_PATH}/logging.a ${TG_PATH}/pkg/github.com/apronchenkov/syslog_client/syslog_client.a
 	${CC} ${LDFLAGS} ${OPTFLAGS} -o $@ $^
 
 clean:
-	$(RM) $g{BIN_PATH}/sample ${PKG_PATH}/*.a ${PKG_PATH}/*.o
+	$(RM) $g{BIN_PATH}/yalog_sample ${PKG_PATH}/*.a ${PKG_PATH}/*.o
 
 format:
 	clang-format -i *.h *.c public/*.h
