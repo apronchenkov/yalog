@@ -1,6 +1,6 @@
 #include "public/basic.h"
-#include <common/logging/syslog_client/syslog_client.h>
 #include <errno.h>
+#include <github.com/apronchenkov/syslog_client/public/SyslogClient.h>
 #include <math.h>
 #include <stdlib.h>
 #include <sys/time.h>
@@ -27,12 +27,9 @@ static inline int GetSyslogSeverity(int severity) {
 }
 
 static void YalogSyslogSink_Send(YalogSink *self, const YalogMessage *message) {
-  struct timeval tv;
-  tv.tv_sec = (time_t)floor(message->unix_time);
-  tv.tv_usec = lround(floor(1e6 * fmod(message->unix_time, 1.0)));
   SyslogClientSend(((YalogSyslogSink *)self)->syslog_client,
-                   GetSyslogSeverity(message->severity), &tv, message->text,
-                   message->text_size);
+                   GetSyslogSeverity(message->severity), message->unix_time,
+                   message->text, message->text_size);
   // We have nothing to do if it fails.
 }
 

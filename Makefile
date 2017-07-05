@@ -1,26 +1,20 @@
-.PHONY: all clean format
-
 PROJECT = github.com/apronchenkov/yalog
 BIN_PATH = ${TG_PATH}/bin
 PKG_PATH = ${TG_PATH}/pkg/${PROJECT}
 SRC_PATH = ${TG_PATH}/src/${PROJECT}
 
 OPTFLAGS = -g -O2
-UNAME_S := $(shell uname -s)
-ifeq ($(UNAME_S),Darwin)
-	OPTFLAGS += -mmacosx-version-min=10.6
-endif
-
-CPPFLAGS += -isystem ${TG_PATH}/src
-CFLAGS += -Wall -Wextra -pedantic -std=gnu11 ${OPTFLAGS}
+CPPFLAGS += -Wall -Wextra -pedantic -isystem ${TG_PATH}/src
+CFLAGS += -std=c99
 LDFLAGS += -lpthread ${OPTFLAGS}
+
+.PHONY: all clean format
 
 all: ${BIN_PATH}/sample ${PKG_PATH}/core.a ${PKG_PATH}/basic.a ${PKG_PATH}/logging.a
 
 ${PKG_PATH}/%.o: $(SRC_PATH)/%.c
-	mkdir -p $(dir $@)
-	${CC} ${CPPFLAGS} ${CFLAGS} ${OPTFLAGS} -c -o $@ $^
-
+	@mkdir -p $(dir $@)
+	${CC} ${CFLAGS} ${CPPFLAGS} ${OPTFLAGS} -c -o $@ $^
 
 ${PKG_PATH}/core.a: ${PKG_PATH}/core.o
 	ar rcs $@ $^
@@ -31,11 +25,14 @@ ${PKG_PATH}/basic.a: ${PKG_PATH}/file_sink.o ${PKG_PATH}/plain_config.o ${PKG_PA
 ${PKG_PATH}/logging.a: ${PKG_PATH}/logging_printf.o
 	ar rcs $@ $^
 
-${BIN_PATH}/sample: ${PKG_PATH}/sample.o ${PKG_PATH}/core.a ${PKG_PATH}/basic.a ${PKG_PATH}/logging.a
+${TG_PATH}/pkg/github.com/apronchenkov/syslog_client/syslog_client.a:
+	make -f ${TG_PATH}/src/github.com/apronchenkov/syslog_client/syslog_client.a $^
+
+${BIN_PATH}/sample: ${PKG_PATH}/sample.o ${PKG_PATH}/core.a ${PKG_PATH}/basic.a ${PKG_PATH}/logging.a ${TG_PATH}/pkg/github.com/apronchenkov/syslog_client/syslog_client.a
 	${CC} ${LDFLAGS} ${OPTFLAGS} -o $@ $^
 
 clean:
-	$(RM) ${BIN_PATH}/sample ${PKG_PATH}/*.a ${PKG_PATH}/*.o
+	$(RM) $g{BIN_PATH}/sample ${PKG_PATH}/*.a ${PKG_PATH}/*.o
 
 format:
 	clang-format -i *.h *.c public/*.h
