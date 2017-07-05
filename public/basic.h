@@ -1,6 +1,4 @@
-#ifndef __yalog_backend_h__
-#define __yalog_backend_h__
-
+#pragma once
 #include "core.h"
 #include <stdbool.h>
 #include <stdio.h>
@@ -18,4 +16,3 @@ YalogSink *YalogCreateSyslogSink(int threshold, const char *ident);
 #ifdef __cplusplus
 }  // extern "C"
 #endif
-#endif  //_yalog_backend_h__

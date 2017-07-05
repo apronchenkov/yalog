@@ -1,25 +1,39 @@
-#ifndef __yalog_core_h__
-#define __yalog_core_h__ 1
-
-#include "logging.h"
-#include <time.h>
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+#define YALOG_DEBUG (0)
+#define YALOG_INFO (1)
+#define YALOG_WARNING (2)
+#define YALOG_ERROR (3)
+#define YALOG_CRITICAL (4)
+
 typedef struct YalogMessage YalogMessage;
 
 struct YalogMessage {
   int severity;
-  const char *tag;
+  const char *category;
   const char *file;
-  int line;
-  int text_size;
+  int file_line;
+  const char *function;
   const char *text;
-  time_t time_sec;
-  long time_usec;
+  int text_size;
+  double unix_time;
 };
+
+typedef struct YalogLogger YalogLogger;
+
+YalogLogger *YalogGetLogger(const char *category);
+
+const char *YalogLoggerGetCategory(YalogLogger *logger);
+
+void YalogLoggerSend(YalogLogger *logger, const YalogMessage *message);
+
+static inline int YalogIsLoggerEnabled(YalogLogger *logger, int severity) {
+  return __atomic_load_n((int *)logger, __ATOMIC_RELAXED) <= severity;
+}
 
 typedef struct YalogSink YalogSink;
 
@@ -29,7 +43,6 @@ struct YalogSink {
 
   int threshold;
   void (*Send)(YalogSink * /*self*/, const YalogMessage * /*message*/);
-  void (*Flush)(YalogSink * /*self*/);
 };
 
 typedef struct YalogConfig YalogConfig;
@@ -38,8 +51,11 @@ struct YalogConfig {
   unsigned int ref_counter;
   void (*Destroy)(const YalogConfig * /*self*/);
 
-  YalogSink *(*GetSink)(const YalogConfig * /*self*/, const char * /*tag*/);
+  YalogSink *(*GetSink)(const YalogConfig * /*self*/,
+                        const char * /*category*/);
 };
+
+void YalogSetConfig(const YalogConfig *config);
 
 #define YALOG_REF_INIT(ptr, destroy) \
   ((ptr)->ref_counter = 1, (ptr)->Destroy = destroy, (ptr))
@@ -54,11 +70,8 @@ struct YalogConfig {
                                    __ATOMIC_RELAXED))                      \
     (void)0;                                                               \
   else                                                                     \
-  (ptr)->Destroy(ptr)
-
-void YalogSetConfig(const YalogConfig *config);
+    (ptr)->Destroy(ptr)
 
 #ifdef __cplusplus
 }  // extern "C"
 #endif
-#endif  //_yalog_core_h__

@@ -1,62 +1,56 @@
-#include "public/backend.h"
-#include "public/core.h"
-#include "syslog_send.h"
+#include "public/basic.h"
+#include <common/logging/syslog_client/syslog_client.h>
+#include <errno.h>
+#include <math.h>
 #include <stdlib.h>
-#include <string.h>
-#include <syslog.h>
-#include <unistd.h>
+#include <sys/time.h>
 
 typedef struct YalogSyslogSink YalogSyslogSink;
 
 struct YalogSyslogSink {
   YalogSink base;
-  int ident_size;
-  char ident[1];
+  SyslogClient *syslog_client;
 };
 
-static inline int Pri(int severity) {
+static inline int GetSyslogSeverity(int severity) {
   if (severity <= YALOG_DEBUG) {
-    return LOG_USER | LOG_DEBUG;
+    return SYSLOG_SEVERITY_DEBUG;
   } else if (severity <= YALOG_INFO) {
-    return LOG_USER | LOG_INFO;
+    return SYSLOG_SEVERITY_INFO;
   } else if (severity <= YALOG_WARNING) {
-    return LOG_USER | LOG_WARNING;
+    return SYSLOG_SEVERITY_WARNING;
   } else if (severity <= YALOG_ERROR) {
-    return LOG_USER | LOG_ERR;
+    return SYSLOG_SEVERITY_ERROR;
   } else {
-    return LOG_USER | LOG_CRIT;
+    return SYSLOG_SEVERITY_CRITICAL;
   }
 }
 
 static void YalogSyslogSink_Send(YalogSink *self, const YalogMessage *message) {
-  struct tm tm;
-  localtime_r(&message->time_sec, &tm);
-  char header[32];
-  size_t header_size = 0;
-  header_size += snprintf(header + header_size, sizeof(header) - header_size,
-                          "<%d>", Pri(message->severity));
-  header_size += strftime(header + header_size, sizeof(header) - header_size,
-                          "%h %e %T ", &tm);
-  char pid[32];
-  size_t pid_size = snprintf(pid, sizeof(pid), "[%lu]: ", (long)getpid());
-  YalogSyslogSend(header, header_size, ((YalogSyslogSink *)self)->ident,
-                  ((YalogSyslogSink *)self)->ident_size, pid, pid_size,
-                  message->text, message->text_size);
+  struct timeval tv;
+  tv.tv_sec = (time_t)floor(message->unix_time);
+  tv.tv_usec = lround(floor(1e6 * fmod(message->unix_time, 1.0)));
+  SyslogClientSend(((YalogSyslogSink *)self)->syslog_client,
+                   GetSyslogSeverity(message->severity), &tv, message->text,
+                   message->text_size);
+  // We have nothing to do if it fails.
 }
 
-static void YalogSyslogSink_Flush(YalogSink *self) { (void)self; }
-
 static void YalogSyslogSink_Destroy(const YalogSink *self) {
+  SyslogClientDestroy(((YalogSyslogSink *)self)->syslog_client);
   free((void *)self);
 }
 
 YalogSink *YalogCreateSyslogSink(int threshold, const char *ident) {
-  const size_t ident_size = strlen(ident);
-  YalogSyslogSink *self = malloc(sizeof(YalogSyslogSink) + ident_size);
+  YalogSyslogSink *self = malloc(sizeof(YalogSyslogSink));
   self->base.threshold = threshold;
   self->base.Send = YalogSyslogSink_Send;
-  self->base.Flush = YalogSyslogSink_Flush;
-  self->ident_size = ident_size;
-  strcpy(self->ident, ident);
+  self->syslog_client = SyslogClientCreateDefault(SYSLOG_FACILITY_USER, ident);
+  if (!self->syslog_client) {
+    const int errno_copy = errno;
+    free(self);
+    errno = errno_copy;
+    return NULL;
+  }
   return YALOG_REF_INIT(&self->base, YalogSyslogSink_Destroy);
 }

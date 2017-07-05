@@ -1,5 +1,4 @@
-#include "public/backend.h"
-#include "public/core.h"
+#include "public/basic.h"
 #include <stdlib.h>
 
 typedef struct YalogPlainConfig YalogPlainConfig;
@@ -10,8 +9,8 @@ struct YalogPlainConfig {
 };
 
 static YalogSink *YalogPlainConfig_GetSink(const YalogConfig *self,
-                                           const char *tag) {
-  (void)tag;
+                                           const char *category) {
+  (void)category;
   return YALOG_REF_ACQUIRE(((const YalogPlainConfig *)self)->sink);
 }
 
