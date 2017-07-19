@@ -1,18 +1,19 @@
-#ifndef __yalog_spinlock_h__
-#define __yalog_spinlock_h__ 1
+#pragma once
 
 #if __APPLE__
-#include <libkern/OSAtomic.h>
-typedef OSSpinLock YalogSpinlock;
+#include <os/lock.h>
+typedef os_unfair_lock YalogSpinlock;
 
-static inline void YalogSpinInit(YalogSpinlock *spinlock) { spinlock = 0; }
+static inline void YalogSpinInit(YalogSpinlock *spinlock) {
+  *spinlock = OS_UNFAIR_LOCK_INIT;
+}
 
 static inline void YalogSpinLock(YalogSpinlock *spinlock) {
-  OSSpinLockLock(spinlock);
+  os_unfair_lock_lock(spinlock);
 }
 
 static inline void YalogSpinUnlock(YalogSpinlock *spinlock) {
-  OSSpinLockUnlock(spinlock);
+  os_unfair_lock_unlock(spinlock);
 }
 #else
 #include <pthread.h>
@@ -30,4 +31,3 @@ static inline void YalogSpinUnlock(YalogSpinlock *spinlock) {
   pthread_spin_unlock(spinlock);
 }
 #endif
-#endif  //_yalog_spinlock_h__
