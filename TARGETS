@@ -1,0 +1,93 @@
+c_library(
+    name='core',
+    srcs=[
+        'core.c',
+    ],
+    headers=[
+        'public/core.h',
+        'spinlock.h',
+    ],
+    deps=[
+        '_system:pthread',
+    ],
+)
+
+c_library(
+    name='basic',
+    srcs=[
+        'file_sink.c',
+        'plain_config.c',
+        'stderr_sink.c',
+        'syslog_sink.c',
+    ],
+    headers=[
+        'public/basic.h',
+    ],
+    deps=[
+        ':core',
+        '//github.com/apronchenkov/syslog_client:syslog_client',
+    ],
+)
+
+c_library(
+    name='logging_printf',
+    srcs=[
+        'logging_printf.c',
+    ],
+    headers=[
+        'public/logging_printf.h',
+    ],
+    deps=[
+        ':core',
+    ],
+)
+
+cxx_library(
+    name='logging_ostream',
+    srcs=[
+        'logging_ostream.cpp',
+    ],
+    headers=[
+        'public/logging_ostream.h',
+    ],
+    deps=[
+        ':core',
+    ],
+)
+
+c_library(
+    name='logging',
+    deps=[
+        ':basic',
+        ':logging_printf',
+    ],
+)
+
+cxx_library(
+    name='loggingxx',
+    deps=[
+        ':basic',
+        ':logging_printf',
+        ':logging_ostream',
+    ],
+)
+
+c_binary(
+    name='yalog_sample',
+    srcs=[
+        'sample.c',
+    ],
+    deps=[
+        ':logging',
+    ],
+)
+
+cxx_binary(
+    name='yalog_samplexx',
+    srcs=[
+        'samplexx.cpp',
+    ],
+    deps=[
+        ':loggingxx',
+    ],
+)
