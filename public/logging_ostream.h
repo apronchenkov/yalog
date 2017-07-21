@@ -11,7 +11,7 @@ namespace yalog {
 
 class Message {
  public:
-  Message(YalogLogger *logger, int severity, const char *file, int file_line,
+  Message(int severity, YalogLogger *logger, const char *file, int file_line,
           const char *function);
 
   ~Message() noexcept;
@@ -53,9 +53,9 @@ Message &Message::operator<<(const T &item) {
 
 }  // namespace yalog
 
-#define YALOG_OSTREAM(logger, severity)                                \
+#define YALOG_OSTREAM(severity, logger)                                \
   if (!YalogIsLoggerEnabled((logger), (YALOG_##severity)))             \
     (void)0;                                                           \
   else                                                                 \
-    ::yalog::Message((logger), (YALOG_##severity), __FILE__, __LINE__, \
+    ::yalog::Message((YALOG_##severity), (logger), __FILE__, __LINE__, \
                      __PRETTY_FUNCTION__)

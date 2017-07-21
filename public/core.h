@@ -25,6 +25,8 @@ struct YalogMessage {
 
 typedef struct YalogLogger YalogLogger;
 
+extern YalogLogger *const default_logger;
+
 YalogLogger *YalogGetLogger(const char *category);
 
 const char *YalogLoggerGetCategory(YalogLogger *logger);

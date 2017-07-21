@@ -5,10 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-static pthread_mutex_t global_mutex = PTHREAD_MUTEX_INITIALIZER;
-static YalogLogger *global_loggers_head = NULL;
-static const YalogConfig *global_config = NULL;
-
 struct YalogLogger {
   volatile int threshold;
   YalogSpinlock lock;
@@ -16,6 +12,13 @@ struct YalogLogger {
   YalogLogger *next;
   char category[1];
 };
+
+static pthread_mutex_t global_mutex = PTHREAD_MUTEX_INITIALIZER;
+static YalogLogger default_logger_storage = {.lock = YALOG_SPINLOCK_INIT};
+static YalogLogger *global_loggers_head = &default_logger_storage;
+static const YalogConfig *global_config = NULL;
+
+YalogLogger *const default_logger = &default_logger_storage;
 
 static void YalogLoggerResetSink(YalogLogger *logger) {
   YalogSink *sink = NULL;

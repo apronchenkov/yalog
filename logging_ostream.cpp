@@ -5,7 +5,7 @@
 namespace yalog {
 namespace {
 
-YalogMessage initYalogMessage(YalogLogger *logger, int severity,
+YalogMessage initYalogMessage(int severity, YalogLogger *logger,
                               const char *file, int file_line,
                               const char *function) {
   struct timeval tv;
@@ -35,9 +35,9 @@ constexpr const int MESSAGE_MAX_SIZE = 8192;
 
 class Message::Impl {
  public:
-  Impl(YalogLogger *logger, int severity, const char *file, int file_line,
+  Impl(int severity, YalogLogger *logger, const char *file, int file_line,
        const char *function)
-      : message_(initYalogMessage(logger, severity, file, file_line, function)),
+      : message_(initYalogMessage(severity, logger, file, file_line, function)),
         logger_(logger),
         buffer_(new char[MESSAGE_MAX_SIZE]),
         streambuf_(buffer_.get(), MESSAGE_MAX_SIZE),
@@ -59,9 +59,9 @@ class Message::Impl {
   std::ostream ostream_;
 };
 
-Message::Message(YalogLogger *logger, int severity, const char *file,
+Message::Message(int severity, YalogLogger *logger, const char *file,
                  int file_line, const char *function)
-    : impl_(new Impl(logger, severity, file, file_line, function)) {}
+    : impl_(new Impl(severity, logger, file, file_line, function)) {}
 
 Message::~Message() noexcept { delete impl_; }
 
