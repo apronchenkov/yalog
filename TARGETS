@@ -27,6 +27,9 @@ c_library(
         ':core',
         '//github.com/apronchenkov/syslog_client:syslog_client',
     ],
+    linker_flags=[
+        '-lm',
+    ],
 )
 
 c_library(

@@ -22,7 +22,7 @@ void YalogPrintf(int severity, YalogLogger *logger, const char *file,
     (void)0;                                                                   \
   else                                                                         \
     YalogPrintf((YALOG_##severity), YALOG_PRINTF_GET_LOGGER(arg), __FILE__,    \
-                __LINE__, __PRETTY_FUNCTION__, __VA_ARGS__)
+                __LINE__, __extension__ __PRETTY_FUNCTION__, __VA_ARGS__)
 
 #ifdef __cplusplus
 }  // extern "C"
