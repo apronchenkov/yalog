@@ -5,7 +5,7 @@ int main() {
   YalogLogger *const logger = YalogGetLogger("123");
   YalogSetConfig(YalogCreatePlainConfig(YalogCreateStderrSink(YALOG_INFO)));
   YALOG_OSTREAM(DEBUG, logger) << "Hello, World!";
-  YALOG_OSTREAM(INFO, logger) << "Hello, World!";
+  YALOG_OSTREAM(INFO) << "Hello, World!";
   YALOG_OSTREAM(WARNING, logger) << "Hello, World!";
   YALOG_OSTREAM(ERROR, logger) << "Hello, World!";
   YALOG_OSTREAM(CRITICAL, logger)
