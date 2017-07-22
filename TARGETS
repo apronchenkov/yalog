@@ -9,6 +9,7 @@ c_library(
     ],
     deps=[
         '_system:pthread',
+        '_uthash:uthash',
     ],
 )
 
