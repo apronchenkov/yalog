@@ -50,7 +50,7 @@ struct YalogSink {
 typedef struct YalogConfig YalogConfig;
 
 struct YalogConfig {
-  unsigned int ref_counter;
+  volatile unsigned int ref_counter;
   void (*Destroy)(const YalogConfig * /*self*/);
 
   YalogSink *(*GetSink)(const YalogConfig * /*self*/,

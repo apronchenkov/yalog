@@ -43,16 +43,12 @@ static inline unsigned int YalogSpinYieldK(unsigned int k) {
     if (k & 1) {
       sched_yield();
     } else {
-      struct timespec ts;
-      ts.tv_sec = 0;
-      ts.tv_nsec = 1000;
+      struct timespec ts = {.tv_sec = 0, .tv_nsec = 1000};
       nanosleep(&ts, 0);
     }
     return k + 1;
   } else {
-    struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = 500000;
+    struct timespec ts = {.tv_sec = 0, .tv_nsec = 500000};
     nanosleep(&ts, 0);
     return k;
   }
