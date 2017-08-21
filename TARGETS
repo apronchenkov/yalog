@@ -8,7 +8,6 @@ c_library(
         'spinlock.h',
     ],
     deps=[
-        '_system:pthread',
         '_uthash:uthash',
     ],
 )

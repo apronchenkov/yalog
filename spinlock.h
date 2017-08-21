@@ -28,9 +28,9 @@ static inline void YalogSpinUnlock(YalogSpinlock *spinlock) {
 #include <intrin.h>
 #define YALOG_SPINLOCK_ASM_VOLATILE_PAUSE() ::_mm_pause()
 #elif defined(__i386__) || defined(__x86_64__) || defined(_M_X64)
-#define YALOG_SPINLOCK_ASM_VOLATILE_PAUSE() asm volatile("pause")
+#define YALOG_SPINLOCK_ASM_VOLATILE_PAUSE() __asm__ volatile("pause")
 #elif defined(__arm__) || defined(__aarch64__)
-#define YALOG_SPINLOCK_ASM_VOLATILE_PAUSE() asm volatile("yield")
+#define YALOG_SPINLOCK_ASM_VOLATILE_PAUSE() __asm__ volatile("yield")
 #endif
 
 static inline unsigned int YalogSpinYieldK(unsigned int k) {
