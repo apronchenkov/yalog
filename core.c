@@ -42,10 +42,12 @@ YalogLogger *YalogGetLogger(const char *category) {
   YalogLogger *logger;
   pthread_mutex_lock(&global_mutex);
   if (*category == '\0') {
+    pthread_mutex_unlock(&global_mutex);
     return default_logger;
   }
   HASH_FIND_STR(global_loggers, category, logger);
   if (logger) {
+    pthread_mutex_unlock(&global_mutex);
     return logger;
   }
   logger = malloc(sizeof(YalogLogger) + strlen(category));
