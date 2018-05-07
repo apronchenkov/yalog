@@ -1,4 +1,4 @@
-c_library(
+cc_library(
     name='uthash',
     headers=[
         'uthash.h',
