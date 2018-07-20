@@ -8,7 +8,7 @@ cc_library(
         'spinlock.h',
     ],
     deps=[
-        '_uthash:uthash',
+        '//github.com/apronchenkov/third_party:uthash',
     ],
 )
 

@@ -1,6 +1,6 @@
 #include "public/core.h"
 #include "spinlock.h"
-#include "_uthash/uthash.h"
+#include <uthash/uthash.h>
 #include <limits.h>
 #include <pthread.h>
 #include <stdlib.h>
