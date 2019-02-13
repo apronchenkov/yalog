@@ -1,10 +1,10 @@
 #include "public/core.h"
 #include "spinlock.h"
-#include <uthash/uthash.h>
 #include <limits.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <string.h>
+#include <uthash/uthash.h>
 
 struct YalogLogger {
   volatile int threshold;
