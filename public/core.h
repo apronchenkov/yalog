@@ -40,10 +40,10 @@ static inline int YalogIsLoggerEnabled(YalogLogger *logger, int severity) {
 typedef struct YalogSink YalogSink;
 
 struct YalogSink {
-  unsigned int ref_counter;
+  volatile unsigned int ref_counter;
   void (*Destroy)(const YalogSink * /*self*/);
 
-  int threshold;
+  volatile int threshold;
   void (*Send)(YalogSink * /*self*/, const YalogMessage * /*message*/);
 };
 

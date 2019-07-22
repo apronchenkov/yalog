@@ -15,7 +15,8 @@ struct YalogLogger {
 };
 
 static pthread_mutex_t global_mutex = PTHREAD_MUTEX_INITIALIZER;
-static YalogLogger default_logger_storage = {.lock = YALOG_SPINLOCK_INIT};
+static YalogLogger default_logger_storage = {.threshold = INT_MAX,
+                                             .lock = YALOG_SPINLOCK_INIT};
 static YalogLogger *global_loggers = NULL;
 static const YalogConfig *global_config = NULL;
 

@@ -2,10 +2,10 @@ cc_library(
     name='core',
     srcs=[
         'core.c',
+        'spinlock.h',
     ],
     headers=[
         'public/core.h',
-        'spinlock.h',
     ],
     deps=[
         '//github.com/apronchenkov/third_party:uthash',
