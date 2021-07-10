@@ -10,8 +10,16 @@ extern "C" {
 #define YALOG_ERROR (3)
 #define YALOG_CRITICAL (4)
 
-typedef struct YalogMessage YalogMessage;
+// An opaque structure representing a logger.
+//
+// Ownership: Each logger object is a singletone. It's safe to pass a pointer
+// between threads.
+typedef struct YalogLogger YalogLogger;
 
+// A message for logging.
+//
+// This structure represents an interface, and doesn't hold ownership.
+// If you need to pass a message between threads, please create a deep copy.
 struct YalogMessage {
   int severity;
   const char *category;
@@ -23,40 +31,62 @@ struct YalogMessage {
   double unix_time;
 };
 
-typedef struct YalogLogger YalogLogger;
+typedef struct YalogMessage YalogMessage;
 
+// Default logger corresponding to an empty category name.
 extern YalogLogger *const default_logger;
 
+// Returns the logger instance by the category name.
 YalogLogger *YalogGetLogger(const char *category);
 
+// Returns the category name corresponding to the logger.
 const char *YalogLoggerGetCategory(YalogLogger *logger);
 
+// Sends a message to the logger.
 void YalogLoggerSend(YalogLogger *logger, const YalogMessage *message);
 
+// Returns non-zero if the logger is enabled for a particular serverity level.
 static inline int YalogIsLoggerEnabled(YalogLogger *logger, int severity) {
   return __atomic_load_n((int *)logger, __ATOMIC_RELAXED) <= severity;
 }
 
-typedef struct YalogSink YalogSink;
-
+// An interface for a logging message consumer.
+//
+// Ownership is represented by ref-counting. Please use YALOG_REF_ACQUIRE and
+// YALOG_REF_RELEASE macros to manipulate it.
 struct YalogSink {
   volatile unsigned int ref_counter;
-  void (*Destroy)(const YalogSink * /*self*/);
 
-  volatile int threshold;
-  void (*Send)(YalogSink * /*self*/, const YalogMessage * /*message*/);
+  // Threshold associated with the logger sink instance.
+  int threshold; /* const */
+
+  // Releases resources associated with the object.
+  void (*Destroy)(struct YalogSink const * /*self*/);
+
+  // Send the given message to this sink.
+  void (*Send)(struct YalogSink * /*self*/, const YalogMessage * /*message*/);
 };
 
-typedef struct YalogConfig YalogConfig;
+typedef struct YalogSink YalogSink;
 
+// An interface for a logger configuration.
+//
+// Ownership is represented by ref-counting. Please use YALOG_REF_ACQUIRE and
+// YALOG_REF_RELEASE macros to manipulate it.
 struct YalogConfig {
   volatile unsigned int ref_counter;
+
+  // Releases resources associated with the object.
   void (*Destroy)(const YalogConfig * /*self*/);
 
+  // Returns a yalog sink instance corresponding to the specified category.
   YalogSink *(*GetSink)(const YalogConfig * /*self*/,
                         const char * /*category*/);
 };
 
+typedef struct YalogConfig YalogConfig;
+
+// Activate a new logging configuration.
 void YalogSetConfig(const YalogConfig *config);
 
 #define YALOG_REF_INIT(ptr, destroy) \
