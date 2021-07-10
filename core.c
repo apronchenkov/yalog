@@ -1,5 +1,7 @@
 #include "public/core.h"
+
 #include "spinlock.h"
+
 #include <limits.h>
 #include <pthread.h>
 #include <stdlib.h>

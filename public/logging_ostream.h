@@ -5,6 +5,7 @@
 #endif
 
 #include "core.h"
+
 #include <ostream>
 
 namespace yalog {

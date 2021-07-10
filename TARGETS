@@ -86,6 +86,16 @@ cc_binary(
 )
 
 cc_binary(
+    name='yalog_sample_cpp',
+    srcs=[
+        'sample.cpp',
+    ],
+    deps=[
+        ':logging',
+    ],
+)
+
+cc_binary(
     name='yalog_samplexx',
     srcs=[
         'samplexx.cpp',

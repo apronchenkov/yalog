@@ -1,4 +1,5 @@
 #include "public/basic.h"
+
 #include <errno.h>
 #include <github.com/apronchenkov/syslog_client/public/SyslogClient.h>
 #include <math.h>

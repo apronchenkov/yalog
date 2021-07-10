@@ -1,4 +1,5 @@
 #include "public/basic.h"
+
 #include <stdlib.h>
 
 typedef struct YalogPlainConfig YalogPlainConfig;

@@ -57,13 +57,13 @@ static inline int YalogIsLoggerEnabled(YalogLogger *logger, int severity) {
 struct YalogSink {
   volatile unsigned int ref_counter;
 
-  // Threshold associated with the logger sink instance.
-  int threshold; /* const */
+  // Threshold associated with the instance.
+  int threshold; /* immutable */
 
-  // Releases resources associated with the object.
+  // Releases resources associated with the instance.
   void (*Destroy)(struct YalogSink const * /*self*/);
 
-  // Send the given message to this sink.
+  // Send a message to this sink.
   void (*Send)(struct YalogSink * /*self*/, const YalogMessage * /*message*/);
 };
 
@@ -77,10 +77,10 @@ struct YalogConfig {
   volatile unsigned int ref_counter;
 
   // Releases resources associated with the object.
-  void (*Destroy)(const YalogConfig * /*self*/);
+  void (*Destroy)(struct YalogConfig const * /*self*/);
 
   // Returns a yalog sink instance corresponding to the specified category.
-  YalogSink *(*GetSink)(const YalogConfig * /*self*/,
+  YalogSink *(*GetSink)(struct YalogConfig const * /*self*/,
                         const char * /*category*/);
 };
 
