@@ -18,7 +18,11 @@ void YalogVPrintf(int severity, YalogLogger *logger, const char *file,
   message.file_line = file_line;
   message.function = function;
   message.unix_time = tv.tv_sec + 1e-6 * tv.tv_usec;
-  if (format[0] == '%' && format[1] == 's' && format[2] == '\0') {
+  if (format[0] == '\0') {
+    message.text = NULL;
+    message.text_size = 0;
+    YalogLoggerSend(logger, &message);
+  } else if (format[0] == '%' && format[1] == 's' && format[2] == '\0') {
     message.text = va_arg(args, const char *);
     message.text_size = strlen(message.text);
     YalogLoggerSend(logger, &message);
@@ -37,7 +41,7 @@ void YalogVPrintf(int severity, YalogLogger *logger, const char *file,
       // Unable to generate the text. It's likely that formatting string is
       // invalid.
       //
-      // TODO: Should we abort in that case?
+      // FIXME: Should we abort in that case?
     } else if (((size_t)n) < sizeof(text)) {
       message.text = text;
       message.text_size = n;
