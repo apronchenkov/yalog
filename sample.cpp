@@ -5,6 +5,10 @@ int main() {
   YalogLogger *const logger = YalogGetLogger("123");
   YalogSetConfig(YalogCreatePlainConfig(YalogCreateStderrSink(YALOG_INFO)));
 
+  YALOG_PRINTF(INFO, "Hello, World!");
+  YALOG_PRINTF(INFO, "%s, %s!", "Hello", "World");
+  YALOG_PRINTF(INFO, logger, "%s, %s!", "Hello", "World");
+
   YALOG_PRINTF(DEBUG, logger, "%s", "Hello, World!");
   YALOG_PRINTF(INFO, "%s", "Hello, World!");
   YALOG_PRINTF(WARNING, logger, "%s", "Hello, World!");

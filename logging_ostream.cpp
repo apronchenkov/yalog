@@ -66,7 +66,8 @@ Message::Message(int severity, YalogLogger *logger, const char *file,
 
 Message::Message(int severity, const char *file, int file_line,
                  const char *function)
-    : impl_(new Impl(severity, ::default_logger, file, file_line, function)) {}
+    : impl_(new Impl(severity, ::yalog_default_logger, file, file_line,
+                     function)) {}
 
 Message::~Message() noexcept { delete impl_; }
 

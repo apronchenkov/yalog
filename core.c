@@ -22,7 +22,7 @@ static YalogLogger default_logger_storage = {.threshold = INT_MAX,
 static YalogLogger *global_loggers = NULL;
 static const YalogConfig *global_config = NULL;
 
-YalogLogger *const default_logger = &default_logger_storage;
+YalogLogger *const yalog_default_logger = &default_logger_storage;
 
 static void YalogLoggerResetSink(YalogLogger *logger) {
   YalogSink *sink = NULL;
@@ -46,7 +46,7 @@ YalogLogger *YalogGetLogger(const char *category) {
   pthread_mutex_lock(&global_mutex);
   if (*category == '\0') {
     pthread_mutex_unlock(&global_mutex);
-    return default_logger;
+    return yalog_default_logger;
   }
   HASH_FIND_STR(global_loggers, category, logger);
   if (logger) {
@@ -84,7 +84,7 @@ void YalogSetConfig(const YalogConfig *config) {
   pthread_mutex_lock(&global_mutex);
   const YalogConfig *old_config = global_config;
   global_config = config;
-  YalogLoggerResetSink(default_logger);
+  YalogLoggerResetSink(yalog_default_logger);
   for (YalogLogger *logger = global_loggers; logger; logger = logger->hh.next) {
     YalogLoggerResetSink(logger);
   }

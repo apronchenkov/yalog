@@ -34,7 +34,7 @@ struct YalogMessage {
 typedef struct YalogMessage YalogMessage;
 
 // Default logger corresponding to an empty category name.
-extern YalogLogger *const default_logger;
+extern YalogLogger *const yalog_default_logger;
 
 // Returns the logger instance by the category name.
 YalogLogger *YalogGetLogger(const char *category);

@@ -12,54 +12,54 @@ namespace yalog {
 
 class Message {
  public:
-  Message(int severity, YalogLogger *logger, const char *file, int file_line,
-          const char *function);
+  Message(int severity, YalogLogger* logger, const char* file, int file_line,
+          const char* function);
 
-  Message(int severity, const char *file, int file_line, const char *function);
+  Message(int severity, const char* file, int file_line, const char* function);
 
   ~Message() noexcept;
 
   template <typename T>
-  Message &operator<<(const T &item);
+  Message& operator<<(const T& item);
 
   /* Movable but non-copyable */
   Message() noexcept : impl_(nullptr) {}
 
-  Message(Message &&message) noexcept : impl_(message.impl_) {
+  Message(Message&& message) noexcept : impl_(message.impl_) {
     message.impl_ = nullptr;
   }
 
-  Message &operator=(Message &&message) noexcept {
+  Message& operator=(Message&& message) noexcept {
     impl_ = message.impl_;
     message.impl_ = nullptr;
     return *this;
   }
 
-  Message(const Message &) noexcept = delete;
+  Message(const Message&) noexcept = delete;
 
-  Message &operator=(const Message &message) noexcept = delete;
+  Message& operator=(const Message& message) noexcept = delete;
 
  private:
-  std::ostream &GetOStream();
+  std::ostream& GetOStream();
 
   class Impl;
-  Impl *impl_;
+  Impl* impl_;
 };
 
 template <typename T>
-Message &Message::operator<<(const T &item) {
+Message& Message::operator<<(const T& item) {
   if (impl_) {
     GetOStream() << item;
   }
   return *this;
 }
 
-inline bool IsLoggerEnabled(int severity, YalogLogger *logger) {
+inline bool IsLoggerEnabled(int severity, YalogLogger* logger) {
   return YalogIsLoggerEnabled(logger, severity);
 }
 
 inline bool IsLoggerEnabled(int severity) {
-  return YalogIsLoggerEnabled(::default_logger, severity);
+  return YalogIsLoggerEnabled(::yalog_default_logger, severity);
 }
 
 }  // namespace yalog

@@ -6,8 +6,8 @@
 #include <string.h>
 #include <sys/time.h>
 
-void YalogVPrintf(int severity, YalogLogger *logger, const char *file,
-                  int file_line, const char *function, const char *format,
+void YalogVPrintf(int severity, const char *file, int file_line,
+                  const char *function, YalogLogger *logger, const char *format,
                   va_list args) {
   struct timeval tv;
   gettimeofday(&tv, NULL);
@@ -57,10 +57,20 @@ void YalogVPrintf(int severity, YalogLogger *logger, const char *file,
   }
 }
 
-void YalogPrintf(int severity, YalogLogger *logger, const char *file,
-                 int file_line, const char *function, const char *format, ...) {
+void YalogPrintf_1(int severity, const char *file, int file_line,
+                   const char *function, YalogLogger *logger,
+                   const char *format, ...) {
   va_list args;
   va_start(args, format);
-  YalogVPrintf(severity, logger, file, file_line, function, format, args);
+  YalogVPrintf(severity, file, file_line, function, logger, format, args);
+  va_end(args);
+}
+
+void YalogPrintf_2(int severity, const char *file, int file_line,
+                   const char *function, const char *format, ...) {
+  va_list args;
+  va_start(args, format);
+  YalogVPrintf(severity, file, file_line, function, yalog_default_logger,
+               format, args);
   va_end(args);
 }
