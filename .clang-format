@@ -3,10 +3,12 @@ ColumnLimit: 80
 BasedOnStyle: Google
 
 DerivePointerAlignment: false
-PointerAlignment: Right
+PointerAlignment: Left
 
 IncludeCategories:
-  - Regex:           '^"'
+  - Regex:           '^"[^@]'
     Priority:        1
-  - Regex:           '^<'
+  - Regex:           '^"'
     Priority:        2
+  - Regex:           '^<'
+    Priority:        3

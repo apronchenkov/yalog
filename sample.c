@@ -1,7 +1,7 @@
 #include "@/public/basic.h"
 #include "@/public/logging_printf.h"
 
-int main() {
+int main(void) {
   YalogLogger* const logger = YalogGetLogger("123");
   YalogSetConfig(YalogCreatePlainConfig(YalogCreateStderrSink(YALOG_INFO)));
 

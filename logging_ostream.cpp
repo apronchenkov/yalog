@@ -1,4 +1,4 @@
-#include "public/logging_ostream.h"
+#include "@/public/logging_ostream.h"
 
 #include <memory>
 #include <sys/time.h>
@@ -6,9 +6,9 @@
 namespace yalog {
 namespace {
 
-YalogMessage initYalogMessage(int severity, YalogLogger *logger,
-                              const char *file, int file_line,
-                              const char *function) {
+YalogMessage initYalogMessage(int severity, YalogLogger* logger,
+                              const char* file, int file_line,
+                              const char* function) {
   struct timeval tv;
   gettimeofday(&tv, NULL);
   YalogMessage result;
@@ -25,7 +25,7 @@ YalogMessage initYalogMessage(int severity, YalogLogger *logger,
 
 class StreamBuf : public std::streambuf {
  public:
-  StreamBuf(char *buffer, int size) { setp(buffer, buffer + size); }
+  StreamBuf(char* buffer, int size) { setp(buffer, buffer + size); }
 
   int count() const { return pptr() - pbase(); }
 };
@@ -36,8 +36,8 @@ constexpr const int MESSAGE_MAX_SIZE = 8192;
 
 class Message::Impl {
  public:
-  Impl(int severity, YalogLogger *logger, const char *file, int file_line,
-       const char *function)
+  Impl(int severity, YalogLogger* logger, const char* file, int file_line,
+       const char* function)
       : message_(initYalogMessage(severity, logger, file, file_line, function)),
         logger_(logger),
         buffer_(new char[MESSAGE_MAX_SIZE]),
@@ -50,27 +50,27 @@ class Message::Impl {
     YalogLoggerSend(logger_, &message_);
   }
 
-  std::ostream &GetOStream() { return ostream_; }
+  std::ostream& GetOStream() { return ostream_; }
 
  private:
   YalogMessage message_;
-  YalogLogger *logger_;
+  YalogLogger* logger_;
   std::unique_ptr<char[]> buffer_;
   StreamBuf streambuf_;
   std::ostream ostream_;
 };
 
-Message::Message(int severity, YalogLogger *logger, const char *file,
-                 int file_line, const char *function)
+Message::Message(int severity, YalogLogger* logger, const char* file,
+                 int file_line, const char* function)
     : impl_(new Impl(severity, logger, file, file_line, function)) {}
 
-Message::Message(int severity, const char *file, int file_line,
-                 const char *function)
+Message::Message(int severity, const char* file, int file_line,
+                 const char* function)
     : impl_(new Impl(severity, ::yalog_default_logger, file, file_line,
                      function)) {}
 
 Message::~Message() noexcept { delete impl_; }
 
-std::ostream &Message::GetOStream() { return impl_->GetOStream(); }
+std::ostream& Message::GetOStream() { return impl_->GetOStream(); }
 
 }  // namespace yalog

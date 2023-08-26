@@ -1,4 +1,4 @@
-#include "public/logging_printf.h"
+#include "@/public/logging_printf.h"
 
 #include <stdarg.h>
 #include <stdio.h>
@@ -6,8 +6,8 @@
 #include <string.h>
 #include <sys/time.h>
 
-void YalogVPrintf(int severity, const char *file, int file_line,
-                  const char *function, YalogLogger *logger, const char *format,
+void YalogVPrintf(int severity, const char* file, int file_line,
+                  const char* function, YalogLogger* logger, const char* format,
                   va_list args) {
   struct timeval tv;
   gettimeofday(&tv, NULL);
@@ -23,13 +23,13 @@ void YalogVPrintf(int severity, const char *file, int file_line,
     message.text_size = 0;
     YalogLoggerSend(logger, &message);
   } else if (format[0] == '%' && format[1] == 's' && format[2] == '\0') {
-    message.text = va_arg(args, const char *);
+    message.text = va_arg(args, const char*);
     message.text_size = strlen(message.text);
     YalogLoggerSend(logger, &message);
   } else if (format[0] == '%' && format[1] == '.' && format[2] == '*' &&
              format[3] == 's' && format[4] == '\0') {
     message.text_size = va_arg(args, int);
-    message.text = va_arg(args, const char *);
+    message.text = va_arg(args, const char*);
     YalogLoggerSend(logger, &message);
   } else {
     char text[128];
@@ -47,7 +47,7 @@ void YalogVPrintf(int severity, const char *file, int file_line,
       message.text_size = n;
       YalogLoggerSend(logger, &message);
     } else {
-      char *big_text = malloc(n + 1);
+      char* big_text = malloc(n + 1);
       vsnprintf(big_text, n + 1, format, args);
       message.text = big_text;
       message.text_size = n;
@@ -57,17 +57,17 @@ void YalogVPrintf(int severity, const char *file, int file_line,
   }
 }
 
-void YalogPrintf_1(int severity, const char *file, int file_line,
-                   const char *function, YalogLogger *logger,
-                   const char *format, ...) {
+void YalogPrintf_1(int severity, const char* file, int file_line,
+                   const char* function, YalogLogger* logger,
+                   const char* format, ...) {
   va_list args;
   va_start(args, format);
   YalogVPrintf(severity, file, file_line, function, logger, format, args);
   va_end(args);
 }
 
-void YalogPrintf_2(int severity, const char *file, int file_line,
-                   const char *function, const char *format, ...) {
+void YalogPrintf_2(int severity, const char* file, int file_line,
+                   const char* function, const char* format, ...) {
   va_list args;
   va_start(args, format);
   YalogVPrintf(severity, file, file_line, function, yalog_default_logger,

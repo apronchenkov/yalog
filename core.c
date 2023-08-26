@@ -1,6 +1,6 @@
-#include "public/core.h"
+#include "@/public/core.h"
 
-#include "spinlock.h"
+#include "@/spinlock.h"
 
 #include <limits.h>
 #include <pthread.h>
@@ -11,7 +11,7 @@
 struct YalogLogger {
   volatile int threshold;
   YalogSpinlock lock;
-  YalogSink *sink;
+  YalogSink* sink;
   UT_hash_handle hh;
   char category[1];
 };
@@ -19,13 +19,13 @@ struct YalogLogger {
 static pthread_mutex_t global_mutex = PTHREAD_MUTEX_INITIALIZER;
 static YalogLogger default_logger_storage = {.threshold = INT_MAX,
                                              .lock = YALOG_SPINLOCK_INIT};
-static YalogLogger *global_loggers = NULL;
-static const YalogConfig *global_config = NULL;
+static YalogLogger* global_loggers = NULL;
+static const YalogConfig* global_config = NULL;
 
-YalogLogger *const yalog_default_logger = &default_logger_storage;
+YalogLogger* const yalog_default_logger = &default_logger_storage;
 
-static void YalogLoggerResetSink(YalogLogger *logger) {
-  YalogSink *sink = NULL;
+static void YalogLoggerResetSink(YalogLogger* logger) {
+  YalogSink* sink = NULL;
   if (global_config) {
     sink = global_config->GetSink(global_config, logger->category);
   }
@@ -35,14 +35,14 @@ static void YalogLoggerResetSink(YalogLogger *logger) {
   }
   __atomic_store_n(&logger->threshold, threshold, __ATOMIC_RELAXED);
   YalogSpinLock(&logger->lock);
-  YalogSink *old_sink = logger->sink;
+  YalogSink* old_sink = logger->sink;
   logger->sink = sink;
   YalogSpinUnlock(&logger->lock);
   YALOG_REF_RELEASE(old_sink);
 }
 
-YalogLogger *YalogGetLogger(const char *category) {
-  YalogLogger *logger;
+YalogLogger* YalogGetLogger(const char* category) {
+  YalogLogger* logger;
   pthread_mutex_lock(&global_mutex);
   if (*category == '\0') {
     pthread_mutex_unlock(&global_mutex);
@@ -63,12 +63,12 @@ YalogLogger *YalogGetLogger(const char *category) {
   return logger;
 }
 
-const char *YalogLoggerGetCategory(YalogLogger *logger) {
+const char* YalogLoggerGetCategory(YalogLogger* logger) {
   return logger->category;
 }
 
-void YalogLoggerSend(YalogLogger *logger, const YalogMessage *message) {
-  YalogSink *sink = NULL;
+void YalogLoggerSend(YalogLogger* logger, const YalogMessage* message) {
+  YalogSink* sink = NULL;
   YalogSpinLock(&logger->lock);
   if (logger->sink && logger->sink->threshold <= message->severity) {
     sink = YALOG_REF_ACQUIRE(logger->sink);
@@ -80,12 +80,12 @@ void YalogLoggerSend(YalogLogger *logger, const YalogMessage *message) {
   }
 }
 
-void YalogSetConfig(const YalogConfig *config) {
+void YalogSetConfig(const YalogConfig* config) {
   pthread_mutex_lock(&global_mutex);
-  const YalogConfig *old_config = global_config;
+  const YalogConfig* old_config = global_config;
   global_config = config;
   YalogLoggerResetSink(yalog_default_logger);
-  for (YalogLogger *logger = global_loggers; logger; logger = logger->hh.next) {
+  for (YalogLogger* logger = global_loggers; logger; logger = logger->hh.next) {
     YalogLoggerResetSink(logger);
   }
   pthread_mutex_unlock(&global_mutex);

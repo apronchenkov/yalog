@@ -1,5 +1,5 @@
 #pragma once
-#include "core.h"
+#include "@/public/core.h"
 
 #include <stdarg.h>
 
@@ -7,17 +7,17 @@
 extern "C" {
 #endif
 
-void YalogVPrintf(int severity, const char *file, int file_line,
-                  const char *function, YalogLogger *logger, const char *format,
+void YalogVPrintf(int severity, const char* file, int file_line,
+                  const char* function, YalogLogger* logger, const char* format,
                   va_list args);
 
-void YalogPrintf_1(int severity, const char *file, int file_line,
-                   const char *function, YalogLogger *logger,
-                   const char *format, ...)
+void YalogPrintf_1(int severity, const char* file, int file_line,
+                   const char* function, YalogLogger* logger,
+                   const char* format, ...)
     __attribute__((format(printf, 6, 7)));
 
-void YalogPrintf_2(int severity, const char *file, int file_line,
-                   const char *function, const char *format, ...)
+void YalogPrintf_2(int severity, const char* file, int file_line,
+                   const char* function, const char* format, ...)
     __attribute__((format(printf, 5, 6)));
 
 #ifdef __cplusplus
@@ -49,7 +49,7 @@ void YalogPrintf_2(int severity, const char *file, int file_line,
 #include <type_traits>
 
 template <typename T>
-static inline YalogLogger *YalogPrintf_GetLogger(T *arg) {
+static inline YalogLogger* YalogPrintf_GetLogger(T* arg) {
   if constexpr (std::is_base_of_v<YalogLogger, T>) {
     return arg;
   } else {
@@ -59,7 +59,7 @@ static inline YalogLogger *YalogPrintf_GetLogger(T *arg) {
 }
 
 template <typename T>
-static inline auto YalogPrintf_GetImpl(T * /*arg*/) {
+static inline auto YalogPrintf_GetImpl(T* /*arg*/) {
   if constexpr (std::is_base_of_v<YalogLogger, T>) {
     return &YalogPrintf_1;
   } else {

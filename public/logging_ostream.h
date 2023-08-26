@@ -4,7 +4,7 @@
 #error "This interface is available for C++ only."
 #endif
 
-#include "core.h"
+#include "@/public/core.h"
 
 #include <ostream>
 

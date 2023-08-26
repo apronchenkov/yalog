@@ -1,5 +1,7 @@
 #pragma once
 
+#include <github.com/apronchenkov/u7_init/public/refcount.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -22,11 +24,11 @@ typedef struct YalogLogger YalogLogger;
 // If you need to pass a message between threads, please create a deep copy.
 struct YalogMessage {
   int severity;
-  const char *category;
-  const char *file;
+  const char* category;
+  const char* file;
   int file_line;
-  const char *function;
-  const char *text;
+  const char* function;
+  const char* text;
   int text_size;
   double unix_time;
 };
@@ -34,20 +36,20 @@ struct YalogMessage {
 typedef struct YalogMessage YalogMessage;
 
 // Default logger corresponding to an empty category name.
-extern YalogLogger *const yalog_default_logger;
+extern YalogLogger* const yalog_default_logger;
 
 // Returns the logger instance by the category name.
-YalogLogger *YalogGetLogger(const char *category);
+YalogLogger* YalogGetLogger(const char* category);
 
 // Returns the category name corresponding to the logger.
-const char *YalogLoggerGetCategory(YalogLogger *logger);
+const char* YalogLoggerGetCategory(YalogLogger* logger);
 
 // Sends a message to the logger.
-void YalogLoggerSend(YalogLogger *logger, const YalogMessage *message);
+void YalogLoggerSend(YalogLogger* logger, const YalogMessage* message);
 
 // Returns non-zero if the logger is enabled for a particular serverity level.
-static inline int YalogIsLoggerEnabled(YalogLogger *logger, int severity) {
-  return __atomic_load_n((int *)logger, __ATOMIC_RELAXED) <= severity;
+static inline int YalogIsLoggerEnabled(YalogLogger* logger, int severity) {
+  return __atomic_load_n((int*)logger, __ATOMIC_RELAXED) <= severity;
 }
 
 // An interface for a logging message consumer.
@@ -55,16 +57,16 @@ static inline int YalogIsLoggerEnabled(YalogLogger *logger, int severity) {
 // Ownership is represented by ref-counting. Please use YALOG_REF_ACQUIRE and
 // YALOG_REF_RELEASE macros to manipulate it.
 struct YalogSink {
-  volatile unsigned int ref_counter;
+  u7_refcount refcount;
 
   // Threshold associated with the instance.
   int threshold; /* immutable */
 
   // Releases resources associated with the instance.
-  void (*Destroy)(struct YalogSink const * /*self*/);
+  void (*Destroy)(struct YalogSink const* /*self*/);
 
   // Send a message to this sink.
-  void (*Send)(struct YalogSink * /*self*/, const YalogMessage * /*message*/);
+  void (*Send)(struct YalogSink* /*self*/, const YalogMessage* /*message*/);
 };
 
 typedef struct YalogSink YalogSink;
@@ -74,34 +76,30 @@ typedef struct YalogSink YalogSink;
 // Ownership is represented by ref-counting. Please use YALOG_REF_ACQUIRE and
 // YALOG_REF_RELEASE macros to manipulate it.
 struct YalogConfig {
-  volatile unsigned int ref_counter;
+  u7_refcount refcount;
 
   // Releases resources associated with the object.
-  void (*Destroy)(struct YalogConfig const * /*self*/);
+  void (*Destroy)(struct YalogConfig const* /*self*/);
 
   // Returns a yalog sink instance corresponding to the specified category.
-  YalogSink *(*GetSink)(struct YalogConfig const * /*self*/,
-                        const char * /*category*/);
+  YalogSink* (*GetSink)(struct YalogConfig const* /*self*/,
+                        const char* /*category*/);
 };
 
 typedef struct YalogConfig YalogConfig;
 
 // Activate a new logging configuration.
-void YalogSetConfig(const YalogConfig *config);
+void YalogSetConfig(const YalogConfig* config);
 
 #define YALOG_REF_INIT(ptr, destroy) \
-  ((ptr)->ref_counter = 1, (ptr)->Destroy = destroy, (ptr))
+  (u7_refcount_init(&(ptr)->refcount), (ptr)->Destroy = destroy, (ptr))
 
-#define YALOG_REF_ACQUIRE(ptr)                                \
-  (__atomic_fetch_add((unsigned int *)&(ptr)->ref_counter, 1, \
-                      __ATOMIC_RELAXED),                      \
-   (ptr))
+#define YALOG_REF_ACQUIRE(ptr) (u7_refcount_increment(&(ptr)->refcount), (ptr))
 
-#define YALOG_REF_RELEASE(ptr)                                             \
-  if (!(ptr) || __atomic_sub_fetch((unsigned int *)&(ptr)->ref_counter, 1, \
-                                   __ATOMIC_RELAXED))                      \
-    (void)0;                                                               \
-  else                                                                     \
+#define YALOG_REF_RELEASE(ptr)                           \
+  if (!(ptr) || u7_refcount_decrement(&(ptr)->refcount)) \
+    (void)0;                                             \
+  else                                                   \
     (ptr)->Destroy(ptr)
 
 #ifdef __cplusplus

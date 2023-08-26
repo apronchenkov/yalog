@@ -6,15 +6,15 @@ typedef os_unfair_lock YalogSpinlock;
 
 #define YALOG_SPINLOCK_INIT OS_UNFAIR_LOCK_INIT
 
-static inline void YalogSpinInit(YalogSpinlock *spinlock) {
+static inline void YalogSpinInit(YalogSpinlock* spinlock) {
   *spinlock = OS_UNFAIR_LOCK_INIT;
 }
 
-static inline void YalogSpinLock(YalogSpinlock *spinlock) {
+static inline void YalogSpinLock(YalogSpinlock* spinlock) {
   os_unfair_lock_lock(spinlock);
 }
 
-static inline void YalogSpinUnlock(YalogSpinlock *spinlock) {
+static inline void YalogSpinUnlock(YalogSpinlock* spinlock) {
   os_unfair_lock_unlock(spinlock);
 }
 
@@ -58,18 +58,18 @@ typedef atomic_flag YalogSpinlock;
 
 #define YALOG_SPINLOCK_INIT ATOMIC_FLAG_INIT
 
-static inline void YalogSpinInit(YalogSpinlock *spinlock) {
+static inline void YalogSpinInit(YalogSpinlock* spinlock) {
   atomic_flag_clear(spinlock);
 }
 
-static inline void YalogSpinLock(YalogSpinlock *spinlock) {
+static inline void YalogSpinLock(YalogSpinlock* spinlock) {
   unsigned int k = 0;
   while (atomic_flag_test_and_set_explicit(spinlock, memory_order_acquire)) {
     k = YalogSpinYieldK(k);
   }
 }
 
-static inline void YalogSpinUnlock(YalogSpinlock *spinlock) {
+static inline void YalogSpinUnlock(YalogSpinlock* spinlock) {
   atomic_flag_clear_explicit(spinlock, memory_order_release);
 }
 

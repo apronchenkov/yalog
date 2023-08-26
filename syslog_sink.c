@@ -1,4 +1,4 @@
-#include "public/basic.h"
+#include "@/public/basic.h"
 
 #include <errno.h>
 #include <github.com/apronchenkov/syslog_client/public/SyslogClient.h>
@@ -10,7 +10,7 @@ typedef struct YalogSyslogSink YalogSyslogSink;
 
 struct YalogSyslogSink {
   YalogSink base;
-  SyslogClient *syslog_client;
+  SyslogClient* syslog_client;
 };
 
 static inline int GetSyslogSeverity(int severity) {
@@ -27,20 +27,20 @@ static inline int GetSyslogSeverity(int severity) {
   }
 }
 
-static void YalogSyslogSink_Send(YalogSink *self, const YalogMessage *message) {
-  SyslogClientSend(((YalogSyslogSink *)self)->syslog_client,
+static void YalogSyslogSink_Send(YalogSink* self, const YalogMessage* message) {
+  SyslogClientSend(((YalogSyslogSink*)self)->syslog_client,
                    GetSyslogSeverity(message->severity), message->unix_time,
                    message->text, message->text_size);
   // We have nothing to do if it fails.
 }
 
-static void YalogSyslogSink_Destroy(const YalogSink *self) {
-  SyslogClientDestroy(((YalogSyslogSink *)self)->syslog_client);
-  free((void *)self);
+static void YalogSyslogSink_Destroy(const YalogSink* self) {
+  SyslogClientDestroy(((YalogSyslogSink*)self)->syslog_client);
+  free((void*)self);
 }
 
-YalogSink *YalogCreateSyslogSink(int threshold, const char *ident) {
-  YalogSyslogSink *self = malloc(sizeof(YalogSyslogSink));
+YalogSink* YalogCreateSyslogSink(int threshold, const char* ident) {
+  YalogSyslogSink* self = malloc(sizeof(YalogSyslogSink));
   self->base.threshold = threshold;
   self->base.Send = YalogSyslogSink_Send;
   self->syslog_client = SyslogClientCreateDefault(SYSLOG_FACILITY_USER, ident);

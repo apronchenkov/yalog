@@ -9,6 +9,7 @@ cc_library(
     ],
     deps=[
         '//github.com/apronchenkov/third_party:uthash',
+        '//github.com/apronchenkov/u7_init:u7_init',
     ],
 )
 

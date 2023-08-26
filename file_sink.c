@@ -1,5 +1,5 @@
 #define _DEFAULT_SOURCE
-#include "public/basic.h"
+#include "@/public/basic.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -28,15 +28,15 @@ typedef struct YalogFileSink YalogFileSink;
 
 struct YalogFileSink {
   YalogSink base;
-  FILE *file;
+  FILE* file;
   bool close_on_destroy;
 };
 
-static void YalogFileSink_Send(YalogSink *self, const YalogMessage *message) {
+static void YalogFileSink_Send(YalogSink* self, const YalogMessage* message) {
   struct tm tm;
   time_t unix_time_sec = (time_t)floor(message->unix_time);
   localtime_r(&unix_time_sec, &tm);
-  fprintf(((YalogFileSink *)self)->file,
+  fprintf(((YalogFileSink*)self)->file,
           "%c%02d%02d %02d:%02d:%02d.%06ld %ld %s:%d] %s] %.*s\n",
           SeverityChr(message->severity), tm.tm_mon + 1, tm.tm_mday, tm.tm_hour,
           tm.tm_min, tm.tm_sec,
@@ -45,18 +45,18 @@ static void YalogFileSink_Send(YalogSink *self, const YalogMessage *message) {
           message->text_size, message->text);
 }
 
-static void YalogFileSink_Destroy(const YalogSink *self) {
-  if (((const YalogFileSink *)self)->close_on_destroy) {
-    if (fclose(((const YalogFileSink *)self)->file)) {
-      fclose(((const YalogFileSink *)self)->file);  // second try
+static void YalogFileSink_Destroy(const YalogSink* self) {
+  if (((const YalogFileSink*)self)->close_on_destroy) {
+    if (fclose(((const YalogFileSink*)self)->file)) {
+      fclose(((const YalogFileSink*)self)->file);  // second try
     }
   }
-  free((void *)self);
+  free((void*)self);
 }
 
-YalogSink *YalogCreateFileSink(int threshold, FILE *file,
+YalogSink* YalogCreateFileSink(int threshold, FILE* file,
                                bool close_on_destroy) {
-  YalogFileSink *self = malloc(sizeof(YalogFileSink));
+  YalogFileSink* self = malloc(sizeof(YalogFileSink));
   self->base.threshold = threshold;
   self->base.Send = YalogFileSink_Send;
   self->file = file;

@@ -2,7 +2,7 @@
 #include "@/public/logging_printf.h"
 
 int main() {
-  YalogLogger *const logger = YalogGetLogger("123");
+  YalogLogger* const logger = YalogGetLogger("123");
   YalogSetConfig(YalogCreatePlainConfig(YalogCreateStderrSink(YALOG_INFO)));
 
   YALOG_PRINTF(INFO, "Hello, World!");

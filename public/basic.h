@@ -1,5 +1,5 @@
 #pragma once
-#include "core.h"
+#include "@/public/core.h"
 
 #include <stdbool.h>
 #include <stdio.h>
@@ -8,11 +8,11 @@
 extern "C" {
 #endif
 
-const YalogConfig *YalogCreatePlainConfig(YalogSink *sink);
-YalogSink *YalogCreateFileSink(int threshold, FILE *file,
+const YalogConfig* YalogCreatePlainConfig(YalogSink* sink);
+YalogSink* YalogCreateFileSink(int threshold, FILE* file,
                                bool close_on_destroy);
-YalogSink *YalogCreateStderrSink(int threshold);
-YalogSink *YalogCreateSyslogSink(int threshold, const char *ident);
+YalogSink* YalogCreateStderrSink(int threshold);
+YalogSink* YalogCreateSyslogSink(int threshold, const char* ident);
 
 #ifdef __cplusplus
 }  // extern "C"

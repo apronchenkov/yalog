@@ -1,5 +1,5 @@
-#include "public/basic.h"
+#include "@/public/basic.h"
 
-YalogSink *YalogCreateStderrSink(int threshold) {
+YalogSink* YalogCreateStderrSink(int threshold) {
   return YalogCreateFileSink(threshold, stderr, false);
 }
