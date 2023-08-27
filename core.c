@@ -1,7 +1,6 @@
 #include "@/public/core.h"
 
-#include "@/spinlock.h"
-
+#include <github.com/apronchenkov/u7_init/public/spinlock.h>
 #include <limits.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -10,7 +9,7 @@
 
 struct YalogLogger {
   volatile int threshold;
-  YalogSpinlock lock;
+  u7_spinlock lock;
   YalogSink* sink;
   UT_hash_handle hh;
   char category[1];
@@ -18,7 +17,7 @@ struct YalogLogger {
 
 static pthread_mutex_t global_mutex = PTHREAD_MUTEX_INITIALIZER;
 static YalogLogger default_logger_storage = {.threshold = INT_MAX,
-                                             .lock = YALOG_SPINLOCK_INIT};
+                                             .lock = U7_SPINLOCK_INIT};
 static YalogLogger* global_loggers = NULL;
 static const YalogConfig* global_config = NULL;
 
@@ -34,10 +33,10 @@ static void YalogLoggerResetSink(YalogLogger* logger) {
     threshold = sink->threshold;
   }
   __atomic_store_n(&logger->threshold, threshold, __ATOMIC_RELAXED);
-  YalogSpinLock(&logger->lock);
+  u7_spinlock_lock(&logger->lock);
   YalogSink* old_sink = logger->sink;
   logger->sink = sink;
-  YalogSpinUnlock(&logger->lock);
+  u7_spinlock_unlock(&logger->lock);
   YALOG_REF_RELEASE(old_sink);
 }
 
@@ -55,7 +54,7 @@ YalogLogger* YalogGetLogger(const char* category) {
   }
   logger = malloc(sizeof(YalogLogger) + strlen(category));
   strcpy(logger->category, category);
-  YalogSpinInit(&logger->lock);
+  u7_spinlock_init(&logger->lock);
   logger->sink = NULL;
   HASH_ADD_STR(global_loggers, category, logger);
   YalogLoggerResetSink(logger);
@@ -69,11 +68,11 @@ const char* YalogLoggerGetCategory(YalogLogger* logger) {
 
 void YalogLoggerSend(YalogLogger* logger, const YalogMessage* message) {
   YalogSink* sink = NULL;
-  YalogSpinLock(&logger->lock);
+  u7_spinlock_lock(&logger->lock);
   if (logger->sink && logger->sink->threshold <= message->severity) {
     sink = YALOG_REF_ACQUIRE(logger->sink);
   }
-  YalogSpinUnlock(&logger->lock);
+  u7_spinlock_unlock(&logger->lock);
   if (sink) {
     sink->Send(sink, message);
     YALOG_REF_RELEASE(sink);
