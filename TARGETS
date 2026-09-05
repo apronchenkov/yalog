@@ -75,6 +75,18 @@ cc_library(
     ],
 )
 
+cc_test(
+    name='test_logging_printf',
+    srcs=[
+        'test_logging_printf.c',
+    ],
+    deps=[
+        ':basic',
+        ':logging_printf',
+        '//github.com/apronchenkov/u7_init:testing',
+    ],
+)
+
 cc_binary(
     name='yalog_sample',
     srcs=[

@@ -1,10 +1,22 @@
 #include "@/public/logging_printf.h"
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+
+static int YalogSafeStrLen(const char* str, int maxlen) {
+  if (maxlen < 0) {
+    maxlen = INT_MAX;
+  }
+  const char* end = memchr(str, '\0', maxlen);
+  if (end == NULL) {
+    return maxlen;
+  }
+  return end - str;
+}
 
 void YalogVPrintf(int severity, const char* file, int file_line,
                   const char* function, YalogLogger* logger, const char* format,
@@ -24,12 +36,13 @@ void YalogVPrintf(int severity, const char* file, int file_line,
     YalogLoggerSend(logger, &message);
   } else if (format[0] == '%' && format[1] == 's' && format[2] == '\0') {
     message.text = va_arg(args, const char*);
-    message.text_size = strlen(message.text);
+    message.text_size = YalogSafeStrLen(message.text, -1);
     YalogLoggerSend(logger, &message);
   } else if (format[0] == '%' && format[1] == '.' && format[2] == '*' &&
              format[3] == 's' && format[4] == '\0') {
     message.text_size = va_arg(args, int);
     message.text = va_arg(args, const char*);
+    message.text_size = YalogSafeStrLen(message.text, message.text_size);
     YalogLoggerSend(logger, &message);
   } else {
     char text[128];
